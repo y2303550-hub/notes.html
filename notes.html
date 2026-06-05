@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>碎碎念 · 奶油心情日记</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(145deg, #F7F3EE 0%, #E6D9D0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', 'Noto Sans', sans-serif;
+            color: #4D4038;
+            padding: 24px 16px 60px;
+        }
+
+        /* 主容器奶油质感 */
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: rgba(255, 248, 240, 0.65);
+            backdrop-filter: blur(2px);
+            border-radius: 48px 48px 40px 40px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255,255,240,0.8);
+            overflow: hidden;
+            padding: 20px 18px 32px;
+        }
+
+        /* 头部奶油风格 */
+        .app-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            border-bottom: 2px dashed #D9B7A5;
+            padding-bottom: 12px;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .moon-icon {
+            font-size: 42px;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
+        }
+        .app-title {
+            font-size: 28px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #5b4b42, #9a7b6b);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .photo-wall-btn {
+            background: #EBD9CE;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4D4038;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            transition: all 0.2s ease;
+        }
+        .photo-wall-btn:hover {
+            background: #D9B7A5;
+            transform: scale(0.96);
+        }
+
+        /* 新增日记卡片 */
+        .add-card {
+            background: #FFFCF8;
+            border-radius: 32px;
+            padding: 18px 20px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.03);
+            border: 1px solid rgba(217,183,165,0.35);
+        }
+        .textarea-note {
+            width: 100%;
+            border: 1px solid #E7CFC0;
+            border-radius: 28px;
+            padding: 14px 18px;
+            font-size: 16px;
+            background: #FFFAF5;
+            font-family: inherit;
+            resize: vertical;
+            color: #4D4038;
+            outline: none;
+            transition: 0.2s;
+        }
+        .textarea-note:focus {
+            border-color: #C6ABD4;
+            box-shadow: 0 0 0 3px rgba(198,171,212,0.2);
+        }
+        .mood-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0 12px;
+        }
+        .mood-chip {
+            background: #F5EBE4;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid transparent;
+        }
+        .mood-chip.active {
+            background: #C6ABD4;
+            color: white;
+            border-color: #AD8FB5;
+            box-shadow: 0 2px 8px rgba(198,171,212,0.4);
+        }
+        .emoji {
+            font-size: 18px;
+        }
+        .add-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .btn {
+            background: #EBD9CE;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 40px;
+            font-weight: 500;
+            color: #4D4038;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background: #C6ABD4;
+            color: #2E241F;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .btn-primary:hover {
+            background: #b494c2;
+        }
+
+        /* 时间轴区域 */
+        .timeline-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin: 16px 4px 12px;
+        }
+        .timeline-title h3 {
+            font-weight: 500;
+            font-size: 18px;
+        }
+        .timeline-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .timeline-item {
+            background: rgba(255, 252, 245, 0.9);
+            border-radius: 28px;
+            padding: 16px 18px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.04);
+            transition: 0.1s;
+            border-left: 8px solid #D9B7A5;
+            backdrop-filter: blur(2px);
+        }
+        .timeline-date {
+            font-weight: 600;
+            font-size: 18px;
+            letter-spacing: -0.3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed #E7CFC0;
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+        }
+        .date-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .mood-badge {
+            background: #F0E2D8;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .content-text {
+            font-size: 16px;
+            line-height: 1.45;
+            margin: 12px 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .item-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 14px;
+            margin-top: 10px;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 30px;
+            transition: 0.1s;
+            color: #7c6356;
+        }
+        .icon-btn:hover {
+            background: #EBD9CE;
+        }
+        .starred {
+            color: #e6a157;
+        }
+        .down-arrow {
+            text-align: center;
+            font-size: 28px;
+            color: #C6ABD4;
+            margin: -8px 0 -4px;
+        }
+
+        /* 照片墙模态框 */
+        .modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        .modal.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .photo-modal-content {
+            background: #FFFBF5;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 48px;
+            padding: 24px 20px 32px;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .photo-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin: 20px 0;
+            max-height: 60vh;
+            overflow-y: auto;
+            justify-content: center;
+        }
+        .polaroid-card {
+            background: white;
+            padding: 12px 12px 20px 12px;
+            border-radius: 20px;
+            box-shadow: 0 12px 18px -6px rgba(0,0,0,0.1);
+            width: calc(50% - 16px);
+            min-width: 130px;
+            transition: transform 0.15s;
+            text-align: center;
+        }
+        .polaroid-card img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 16px;
+            display: block;
+            margin-bottom: 8px;
+            background: #f4e8df;
+        }
+        .img-rounded {
+            border-radius: 28px !important;
+        }
+        .photo-del {
+            background: #EBD9CE;
+            border: none;
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 40px;
+            margin-top: 6px;
+            cursor: pointer;
+        }
+        .add-photo-area {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        .file-input-label {
+            background: #C6ABD4;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 14px;
+            cursor: pointer;
+            color: #2E241F;
+        }
+        .close-modal {
+            position: absolute;
+            top: 16px; right: 22px;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 480px) {
+            .polaroid-card {
+                width: calc(50% - 12px);
+            }
+            .mood-chip {
+                padding: 4px 12px;
+                font-size: 12px;
+            }
+        }
+        .empty-tip {
+            text-align: center;
+            padding: 28px;
+            color: #b29483;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #bb9a86;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="app-header">
+        <div class="logo-area">
+            <span class="moon-icon">🌙</span>
+            <span class="app-title">碎碎念</span>
+        </div>
+        <button class="photo-wall-btn" id="openPhotoWallBtn">📸 照片墙</button>
+    </div>
+
+    <!-- 新增区域 -->
+    <div class="add-card">
+        <textarea id="noteInput" class="textarea-note" rows="2" placeholder="今天有什么碎碎念呢..."></textarea>
+        <div class="mood-selector" id="moodSelector">
+            <!-- 心情列表动态生成js填充，但内嵌静态也可，为了灵活js动态生成 -->
+        </div>
+        <div class="add-actions">
+            <button id="saveNoteBtn" class="btn btn-primary">✨ 记录</button>
+            <button id="clearEditBtn" class="btn" style="background:#E3D4CA;">取消编辑</button>
+        </div>
+        <div style="font-size:12px; color:#b6a091; margin-top: 8px;">💡 点击记录自动置顶，今天在最前</div>
+    </div>
+
+    <!-- 时间轴区域 -->
+    <div class="timeline-title">
+        <h3>📜 时光轴</h3>
+        <span style="font-size:13px;">🍰 收藏 · 编辑 · 删除</span>
+    </div>
+    <div id="timelineList" class="timeline-list">
+        <!-- 动态渲染时间轴 -->
+        <div class="empty-tip">✨ 写下一段心情，记录今日美好～</div>
+    </div>
+    <footer>💭 奶油风味 · 每一刻都值得珍藏</footer>
+</div>
+
+<!-- 照片墙模态框 -->
+<div id="photoModal" class="modal">
+    <div class="photo-modal-content">
+        <span class="close-modal" id="closeModalBtn">&times;</span>
+        <h3 style="margin-bottom: 8px;">📷 奶油照片墙 · 拍立得记忆</h3>
+        <div class="add-photo-area">
+            <label class="file-input-label">➕ 添加照片
+                <input type="file" id="photoUpload" accept="image/*" style="display:none" multiple>
+            </label>
+            <button id="clearAllPhotosBtn" style="background:#EBD9CE; border:none; border-radius:40px; padding:0 14px;">清空照片墙</button>
+        </div>
+        <div id="photoGrid" class="photo-grid">
+            <!-- 动态照片 -->
+        </div>
+        <p style="font-size:12px; margin-top:8px;">✨ 支持多选，拍立得圆角风格</p>
+    </div>
+</div>
+
+<script>
+    // ---------- 存储 keys ----------
+    const STORAGE_NOTES = 'creamy_notes';
+    const STORAGE_PHOTOS = 'creamy_photos';
+    
+    // 心情列表 (文字+表情)
+    const moodList = [
+        { name: "平静", emoji: "😌" }, { name: "想念", emoji: "💭" }, { name: "开心", emoji: "😊" },
+        { name: "小确幸", emoji: "🍀" }, { name: "幸运", emoji: "🍀✨" }, { name: "伤心", emoji: "😢" },
+        { name: "纠结", emoji: "😖" }, { name: "发呆", emoji: "🌿" }, { name: "值得纪念", emoji: "📅✨" },
+        { name: "迷茫", emoji: "🌀" }, { name: "头痛", emoji: "🤕" }, { name: "生病", emoji: "😷" }
+    ];
+
+    let notes = [];          // { id, text, moodName, moodEmoji, dateStr, timestamp, isStarred }
+    let photos = [];        // 存储 base64 或 blob url (简单使用 base64)
+
+    let editingId = null;   // 正在编辑的条目id，null表示新增
+    let currentMood = { name: "平静", emoji: "😌" }; // 默认心情
+
+    // DOM 元素
+    const noteInput = document.getElementById('noteInput');
+    const moodSelectorDiv = document.getElementById('moodSelector');
+    const saveBtn = document.getElementById('saveNoteBtn');
+    const clearEditBtn = document.getElementById('clearEditBtn');
+    const timelineDiv = document.getElementById('timelineList');
+    const openPhotoWall = document.getElementById('openPhotoWallBtn');
+    const photoModal = document.getElementById('photoModal');
+    const closeModal = document.getElementById('closeModalBtn');
+    const photoUpload = document.getElementById('photoUpload');
+    const photoGrid = document.getElementById('photoGrid');
+    const clearAllPhotosBtn = document.getElementById('clearAllPhotosBtn');
+
+    // ---------- 初始化数据 ----------
+    function loadData() {
+        const storedNotes = localStorage.getItem(STORAGE_NOTES);
+        if(storedNotes) {
+            notes = JSON.parse(storedNotes);
+        } else {
+            // 示例数据 让界面不空旷
+            notes = [
+                { id: Date.now()+1, text: "今天下午茶吃到了一块超软的蛋糕，真幸福～", moodName: "小确幸", moodEmoji: "🍀", dateStr: getTodayDateStr(), timestamp: Date.now(), isStarred: true },
+                { id: Date.now()+2, text: "怀念旧时光，但未来也可期。", moodName: "想念", moodEmoji: "💭", dateStr: getYesterdayDateStr(), timestamp: Date.now()-86400000, isStarred: false },
+            ];
+        }
+        const storedPhotos = localStorage.getItem(STORAGE_PHOTOS);
+        if(storedPhotos) {
+            photos = JSON.parse(storedPhotos);
+        } else {
+            photos = []; // 无示例图片
+        }
+        // 排序: 按timestamp 降序（今天在前）
+        sortNotesDesc();
+        renderMoodSelector();
+        renderTimeline();
+    }
+
+    function sortNotesDesc() {
+        notes.sort((a,b) => b.timestamp - a.timestamp);
+    }
+
+    function getTodayDateStr() {
+        const d = new Date();
+        return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function getYesterdayDateStr() {
+        const d = new Date();
+        d.setDate(d.getDate()-1);
+        return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    // 根据时间戳格式化日期 yyyy.mm.dd
+    function formatDateFromTimestamp(ts) {
+        const d = new Date(ts);
+        return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    // 保存笔记至localStorage
+    function persistNotes() {
+        localStorage.setItem(STORAGE_NOTES, JSON.stringify(notes));
+    }
+
+    // 心情选择器渲染
+    function renderMoodSelector() {
+        moodSelectorDiv.innerHTML = '';
+        moodList.forEach(m => {
+            const chip = document.createElement('div');
+            chip.className = 'mood-chip';
+            if(currentMood.name === m.name) chip.classList.add('active');
+            chip.innerHTML = `<span class="emoji">${m.emoji}</span><span>${m.name}</span>`;
+            chip.addEventListener('click', () => {
+                currentMood = { name: m.name, emoji: m.emoji };
+                renderMoodSelector();
+            });
+            moodSelectorDiv.appendChild(chip);
+        });
+    }
+
+    // 保存或更新
+    function saveOrUpdate() {
+        const content = noteInput.value.trim();
+        if(!content) {
+            alert("写点碎碎念吧～");
+            return;
+        }
+        if(editingId !== null) {
+            // 编辑模式: 保留原 timestamp 不变，但更新文字心情，并保持原收藏状态
+            const index = notes.findIndex(n => n.id === editingId);
+            if(index !== -1) {
+                notes[index].text = content;
+                notes[index].moodName = currentMood.name;
+                notes[index].moodEmoji = currentMood.emoji;
+                // 日期跟随原来的timestamp自动符合原时间线，不需要重新排序吗？不改变时间顺序，但为了显示可能还在同一位置, 用户期望编辑后在原位置保留时间次序
+                // 不过为了体验，编辑后保留原有日期顺序，不需要重新排序但为了避免潜在显示顺序问题，重排一下也可，保持时间降序。
+                sortNotesDesc();
+                persistNotes();
+                renderTimeline();
+                resetForm();
+            }
+        } else {
+            // 新增：今天最新，所以 timestamp 取当前时间，确保排在最前
+            const newNote = {
+                id: Date.now(),
+                text: content,
+                moodName: currentMood.name,
+                moodEmoji: currentMood.emoji,
+                dateStr: getTodayDateStr(),
+                timestamp: Date.now(),
+                isStarred: false,
+            };
+            notes.unshift(newNote); // 头部插入，再排序确保万无一失
+            sortNotesDesc();
+            persistNotes();
+            renderTimeline();
+            resetForm();
+        }
+    }
+
+    function resetForm() {
+        noteInput.value = '';
+        editingId = null;
+        currentMood = { name: "平静", emoji: "😌" };
+        renderMoodSelector();
+    }
+
+    // 编辑功能
+    function editNote(id) {
+        const note = notes.find(n => n.id === id);
+        if(!note) return;
+        editingId = id;
+        noteInput.value = note.text;
+        currentMood = { name: note.moodName, emoji: note.moodEmoji };
+        renderMoodSelector();
+        noteInput.focus();
+    }
+
+    // 删除
+    function deleteNote(id) {
+        if(confirm("删除这条碎碎念吗？")) {
+            notes = notes.filter(n => n.id !== id);
+            persistNotes();
+            renderTimeline();
+            if(editingId === id) resetForm();
+        }
+    }
+
+    // 收藏切换
+    function toggleStar(id) {
+        const note = notes.find(n => n.id === id);
+        if(note) {
+            note.isStarred = !note.isStarred;
+            persistNotes();
+            renderTimeline();
+        }
+    }
+
+    // 渲染时间轴 (按照降序, 展示日期分组视觉效果带↓)
+    function renderTimeline() {
+        if(notes.length === 0) {
+            timelineDiv.innerHTML = '<div class="empty-tip">🌸 暂无记录，写下你的心情吧～</div>';
+            return;
+        }
+        // 已经排好序 b.timestamp - a.timestamp
+        let html = '';
+        notes.forEach((item, idx) => {
+            const dateStr = formatDateFromTimestamp(item.timestamp);
+            const starIcon = item.isStarred ? '⭐️' : '☆';
+            const starActive = item.isStarred ? 'starred' : '';
+            html += `
+                <div class="timeline-item">
+                    <div class="timeline-date">
+                        <div class="date-text">
+                            📅 ${dateStr}
+                            <span class="mood-badge"><span>${item.moodEmoji}</span> ${item.moodName}</span>
+                        </div>
+                        <span style="font-size:14px;">🔖</span>
+                    </div>
+                    <div class="content-text">${escapeHtml(item.text)}</div>
+                    <div class="item-actions">
+                        <button class="icon-btn" onclick="window.toggleStar(${item.id})" title="收藏">${starIcon}</button>
+                        <button class="icon-btn" onclick="window.editNote(${item.id})" title="编辑">✏️</button>
+                        <button class="icon-btn" onclick="window.deleteNote(${item.id})" title="删除">🗑️</button>
+                    </div>
+                </div>
+            `;
+            // 添加时间轴箭头连接线 (除了最后一个)
+            if(idx !== notes.length-1) {
+                html += `<div class="down-arrow">↓</div>`;
+            }
+        });
+        timelineDiv.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    // ---------- 照片墙逻辑 (拍立得圆角/四周圆角) 两种样式均支持，拍立得风格 + 圆角------------
+    function renderPhotoWall() {
+        if(!photoGrid) return;
+        if(photos.length === 0) {
+            photoGrid.innerHTML = '<div style="width:100%; text-align:center; color:#b99d89;">📭 还没有照片，点击添加上传～</div>';
+            return;
+        }
+        let photoHtml = '';
+        photos.forEach((src, idx) => {
+            photoHtml += `
+                <div class="polaroid-card">
+                    <img src="${src}" alt="拍立得记忆" class="img-rounded" style="border-radius: 24px;">
+                    <button class="photo-del" data-index="${idx}">🗑️ 删除</button>
+                </div>
+            `;
+        });
+        photoGrid.innerHTML = photoHtml;
+        // 绑定删除事件
+        document.querySelectorAll('.photo-del').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(btn.getAttribute('data-index'));
+                if(!isNaN(idx)) {
+                    photos.splice(idx, 1);
+                    savePhotosToLocal();
+                    renderPhotoWall();
+                }
+                e.stopPropagation();
+            });
+        });
+    }
+
+    function savePhotosToLocal() {
+        localStorage.setItem(STORAGE_PHOTOS, JSON.stringify(photos));
+    }
+
+    // 处理图片添加 (支持多选，转为base64)
+    function handlePhotoUpload(e) {
+        const files = Array.from(e.target.files);
+        if(files.length === 0) return;
+        files.forEach(file => {
+            if(!file.type.startsWith('image/')) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                const base64 = ev.target.result;
+                photos.push(base64);
+                if(photos.length === files.length + (photos.length - files.length)) {
+                    savePhotosToLocal();
+                    renderPhotoWall();
+                } else {
+                    // 最后一个确保渲染
+                    if(photos.length === files.length + (photos.length - files.filter(f=>true).length)){}
+                }
+                renderPhotoWall();
+            };
+            reader.readAsDataURL(file);
+        });
+        photoUpload.value = '';
+        // 多张异步渲染可能多次render 无伤大雅
+        setTimeout(()=>renderPhotoWall(), 30);
+    }
+
+    function clearAllPhotos() {
+        if(confirm("确定要清空所有照片吗？")) {
+            photos = [];
+            savePhotosToLocal();
+            renderPhotoWall();
+        }
+    }
+
+    // modal控制
+    function openModal() {
+        photoModal.classList.add('show');
+        renderPhotoWall();
+    }
+    function closeModalFunc() {
+        photoModal.classList.remove('show');
+    }
+
+    // 挂载全局函数供 onclick
+    window.toggleStar = toggleStar;
+    window.editNote = editNote;
+    window.deleteNote = deleteNote;
+
+    // 事件绑定
+    saveBtn.addEventListener('click', saveOrUpdate);
+    clearEditBtn.addEventListener('click', resetForm);
+    openPhotoWall.addEventListener('click', openModal);
+    closeModal.addEventListener('click', closeModalFunc);
+    photoModal.addEventListener('click', (e) => {
+        if(e.target === photoModal) closeModalFunc();
+    });
+    photoUpload.addEventListener('change', handlePhotoUpload);
+    clearAllPhotosBtn.addEventListener('click', clearAllPhotos);
+
+    // 额外photo墙关闭按钮
+    // 初始化加载数据
+    loadData();
+    // 如果之前没有照片数据则重新渲染照片墙
+    function initEmpty() {}
+    // 确保点击添加照片时重新渲染
+</script>
+</body>
+</html>
